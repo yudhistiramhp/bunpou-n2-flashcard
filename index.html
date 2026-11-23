@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#f3f6fa" />
+    <title>Flashcard Bunpou N2 — Minggu 1–8</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <h1>Flashcard Bunpou N2</h1>
+      <p class="sub">Minggu 1–8 · Balik kartu, nilai pemahamanmu, lalu ulangi kartu yang belum dikuasai.</p>
+      <div class="toolbar">
+        <select id="week">
+          <option>Minggu 1</option>
+          <option>Minggu 2</option>
+          <option>Minggu 3</option>
+          <option>Minggu 4</option>
+          <option>Minggu 5</option>
+          <option>Minggu 6</option>
+          <option>Minggu 7</option>
+          <option>Minggu 8</option>
+          <option value="Semua">Semua minggu</option>
+        </select>
+        <select id="mode">
+          <option value="all">Semua kartu</option>
+          <option value="pending">Sisa: belum paham / belum dinilai</option>
+        </select>
+        <button id="shuffle">Acak kartu</button
+        ><button id="reset">Reset penilaian<span class="kb"> (R)</span></button>
+      </div>
+      <div class="stats">
+        <div class="stat"><b id="known">0</b><span>Sudah paham</span></div>
+        <div class="stat"><b id="pending">196</b><span>Belum paham / belum dinilai</span></div>
+        <div class="stat"><b id="total">196</b><span>Dalam sesi ini</span></div>
+      </div>
+      <div class="progressrow">
+        <span id="counter">Kartu 1 dari 24</span><span id="weeklabel">Minggu 1</span>
+      </div>
+      <div class="track"><div class="fill" id="fill"></div></div>
+      <div id="emptyMessage" class="message" style="display: none"></div>
+      <div id="finish" class="finish" style="display: none"></div>
+      <div id="stage">
+        <div class="card" id="card" tabindex="0" role="button" aria-label="Balik kartu">
+          <div class="badge no" id="badgeNo">Belum <b id="cntNo">0</b></div>
+          <div class="badge yes" id="badgeYes">Paham <b id="cntYes">0</b></div>
+          <div class="inner" id="inner">
+            <section class="face front">
+              <div class="eyebrow">Sisi depan · Bunpou</div>
+              <div class="frontcontent">
+                <div>
+                  <div class="bun" id="bun"></div>
+                  <div class="hint">
+                    <span class="kb">↑ ↓ atau Spasi = balik kartu<br />← belum paham · → sudah paham</span
+                    ><span class="tc">Ketuk kartu untuk membalik</span>
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="face back">
+              <div class="eyebrow">Sisi belakang · Jawaban</div>
+              <div class="field">
+                <h3>Arti</h3>
+                <p id="arti"></p>
+              </div>
+              <div class="field">
+                <h3>Fungsi singkat</h3>
+                <p id="fungsi"></p>
+              </div>
+              <div class="field">
+                <h3>Pola</h3>
+                <p id="pola"></p>
+              </div>
+              <div class="field">
+                <h3>Contoh kalimat</h3>
+                <p id="exJp" class="exjp"></p>
+                <p id="exId" class="exid"></p>
+              </div>
+              <div id="compare"></div>
+            </section>
+          </div>
+        </div>
+        <div class="controls">
+          <button id="prev">← Sebelumnya</button><button id="flip" class="primary">Balik kartu</button
+          ><button id="next">Berikutnya →</button>
+        </div>
+        <div class="rate">
+          <button id="no" class="red">← Belum paham</button
+          ><button id="yes" class="green">Sudah paham →</button>
+        </div>
+      </div>
+      <p class="note kb">
+        Pintasan keyboard: ↑ balik ke atas · ↓ balik ke bawah · ← belum paham + lanjut · → sudah paham +
+        lanjut · R reset dari awal. Navigasi tanpa menilai: tombol Sebelumnya / Berikutnya.
+      </p>
+      <section class="weeks">
+        <h3>Progres semua minggu</h3>
+        <div id="weekRows"></div>
+        <div class="wlegend">
+          <span>Paham</span><span class="n">Belum paham</span><span class="u">Belum dinilai</span>
+        </div>
+      </section>
+    </main>
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
