@@ -118,6 +118,53 @@ button:disabled {
   perspective: 1200px;
   cursor: pointer;
   outline: none;
+  touch-action: pan-y;
+}
+.card.dragging {
+  will-change: transform;
+  user-select: none;
+}
+.card.drag-yes .face {
+  border-color: var(--green);
+  box-shadow: 0 0 0 calc(2px + var(--py, 0) * 4px) #16a34a40;
+}
+.card.drag-no .face {
+  border-color: var(--orange);
+  box-shadow: 0 0 0 calc(2px + var(--pn, 0) * 4px) #f9731640;
+}
+.stamp {
+  position: absolute;
+  top: 64px;
+  z-index: 6;
+  padding: 4px 14px;
+  border: 3px solid;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 0.06em;
+  opacity: 0;
+  pointer-events: none;
+  background: #fffc;
+}
+.stamp.yes {
+  left: 22px;
+  color: var(--green);
+  border-color: var(--green);
+  transform: rotate(-10deg);
+  opacity: var(--py, 0);
+}
+.stamp.no {
+  right: 22px;
+  color: var(--orange);
+  border-color: var(--orange);
+  transform: rotate(10deg);
+  opacity: var(--pn, 0);
+}
+.card.dragging .badge.yes {
+  transform: scale(calc(1 + var(--py, 0) * 0.4));
+}
+.card.dragging .badge.no {
+  transform: scale(calc(1 + var(--pn, 0) * 0.4));
 }
 .inner {
   position: relative;

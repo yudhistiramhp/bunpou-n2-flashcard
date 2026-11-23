@@ -202,7 +202,7 @@ function move(delta) {
   if (!deck.length || busy) return;
   goTo(index + delta);
 }
-function rate(value) {
+function rate(value, swiped = false) {
   if (!deck.length || busy) return;
   busy = true;
   ratings[deck[index].id] = value;
@@ -221,9 +221,10 @@ function rate(value) {
   setTimeout(() => plus.remove(), 700);
   // animasi kartu keluar ke kiri / kanan
   card.classList.remove("in");
-  card.classList.add(value === "yes" ? "out-yes" : "out-no");
+  if (!swiped) card.classList.add(value === "yes" ? "out-yes" : "out-no");
   setTimeout(() => {
-    card.classList.remove("out-yes", "out-no");
+    card.classList.remove("out-yes", "out-no", "drag-yes", "drag-no");
+    if (swiped) clearDragStyle(card);
     if (index < deck.length - 1) index++;
     else finished = true;
     resetRot();
@@ -260,7 +261,104 @@ $("mode").addEventListener("change", (e) => {
 $("shuffle").addEventListener("click", shuffle);
 $("reset").addEventListener("click", resetAll);
 $("flip").addEventListener("click", () => flip(-1));
-$("card").addEventListener("click", () => flip(-1));
+$("card").addEventListener("click", () => {
+  if (dragged) {
+    dragged = false;
+    return;
+  }
+  flip(-1);
+});
+
+// ===== Swipe di layar sentuh: kanan = paham, kiri = belum =====
+let drag = null,
+  dragged = false;
+const cardEl = $("card");
+function clearDragStyle(card) {
+  card.classList.remove("dragging");
+  card.style.transition = "none";
+  card.style.transform = "";
+  card.style.opacity = "";
+  card.style.removeProperty("--py");
+  card.style.removeProperty("--pn");
+  void card.offsetWidth;
+  card.style.transition = "";
+}
+function dragTo(dx) {
+  const w = cardEl.offsetWidth || 300,
+    p = Math.min(1, Math.abs(dx) / (w * 0.35));
+  cardEl.style.transform = `translateX(${dx}px) rotate(${Math.max(-12, Math.min(12, dx / 14))}deg)`;
+  cardEl.style.setProperty("--py", dx > 0 ? p : 0);
+  cardEl.style.setProperty("--pn", dx < 0 ? p : 0);
+  cardEl.classList.toggle("drag-yes", dx > 25);
+  cardEl.classList.toggle("drag-no", dx < -25);
+}
+cardEl.addEventListener("pointerdown", (e) => {
+  if (busy || !deck.length || finished || e.pointerType === "mouse") return;
+  drag = {
+    id: e.pointerId,
+    x: e.clientX,
+    y: e.clientY,
+    dx: 0,
+    active: false,
+    t: e.timeStamp,
+    lastX: e.clientX,
+    lastT: e.timeStamp,
+    v: 0,
+  };
+});
+cardEl.addEventListener("pointermove", (e) => {
+  if (!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.x,
+    dy = e.clientY - drag.y;
+  if (!drag.active) {
+    if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.2) {
+      drag.active = true;
+      cardEl.setPointerCapture(e.pointerId);
+      cardEl.classList.remove("in");
+      cardEl.classList.add("dragging");
+    } else if (Math.abs(dy) > 10) {
+      drag = null; // scroll vertikal, bukan swipe
+      return;
+    } else return;
+  }
+  const dt = e.timeStamp - drag.lastT;
+  if (dt > 0) drag.v = (e.clientX - drag.lastX) / dt;
+  drag.lastX = e.clientX;
+  drag.lastT = e.timeStamp;
+  drag.dx = dx;
+  dragTo(dx);
+});
+function endDrag(e) {
+  if (!drag || e.pointerId !== drag.id) return;
+  const d = drag;
+  drag = null;
+  if (!d.active) return;
+  dragged = true;
+  setTimeout(() => (dragged = false), 60);
+  const w = cardEl.offsetWidth || 300,
+    far = Math.abs(d.dx) > Math.min(110, w * 0.3),
+    flick = Math.abs(d.v) > 0.6 && Math.abs(d.dx) > 40,
+    dir = d.dx > 0 ? 1 : -1;
+  if (e.type !== "pointercancel" && (far || flick)) {
+    cardEl.style.transition = "transform .25s ease-in, opacity .25s ease-in";
+    cardEl.style.transform = `translateX(${dir * (window.innerWidth + 40)}px) rotate(${dir * 18}deg)`;
+    cardEl.style.opacity = "0";
+    rate(dir > 0 ? "yes" : "no", true);
+  } else {
+    // kembali ke tengah (membal)
+    cardEl.style.transition = "transform .3s cubic-bezier(.2,.9,.3,1.2)";
+    cardEl.style.transform = "";
+    cardEl.style.removeProperty("--py");
+    cardEl.style.removeProperty("--pn");
+    cardEl.classList.remove("drag-yes", "drag-no");
+    setTimeout(() => {
+      cardEl.style.transition = "";
+      cardEl.classList.remove("dragging");
+    }, 300);
+  }
+}
+cardEl.addEventListener("pointerup", endDrag);
+cardEl.addEventListener("pointercancel", endDrag);
 $("prev").addEventListener("click", () => move(-1));
 $("next").addEventListener("click", () => move(1));
 $("no").addEventListener("click", () => rate("no"));
