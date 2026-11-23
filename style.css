@@ -647,6 +647,9 @@ main {
   min-height: clamp(380px, 62vh, 540px);
 }
 @media (hover: none) {
+  .back {
+    transform: rotateY(180deg);
+  }
   .kb {
     display: none;
   }

@@ -37,12 +37,14 @@ function loadDeck(resetIndex = true) {
   resetRot();
   render();
 }
+// HP / layar sentuh: kartu dibalik ke kanan (sumbu Y). Desktop: ke atas/bawah (sumbu X).
+const flipAxis = () => (window.matchMedia("(hover: none)").matches ? "Y" : "X");
 function resetRot() {
   // kembali ke sisi depan tanpa animasi
   rot = 0;
   const el = $("inner");
   el.classList.add("notrans");
-  el.style.transform = "rotateX(0deg)";
+  el.style.transform = `rotate${flipAxis()}(0deg)`;
   void el.offsetWidth;
   el.classList.remove("notrans");
 }
@@ -184,8 +186,10 @@ function resetAll() {
 function flip(dir) {
   // dir: -1 = ke atas (↑), 1 = ke bawah (↓)
   if (!deck.length || busy) return;
-  rot += dir === 1 ? -180 : 180; // ↑ = rotateX positif, ↓ = rotateX negatif
-  $("inner").style.transform = `rotateX(${rot}deg)`;
+  const axis = flipAxis();
+  // desktop: ↑ = rotateX positif, ↓ = rotateX negatif. HP: selalu ke kanan (rotateY positif)
+  rot += axis === "Y" ? 180 : dir === 1 ? -180 : 180;
+  $("inner").style.transform = `rotate${axis}(${rot}deg)`;
   $("flip").textContent = isFlipped() ? "Lihat bunpou" : "Balik kartu";
 }
 function goTo(n) {
